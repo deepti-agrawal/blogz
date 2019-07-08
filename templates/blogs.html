@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content%}
+<form name='viewform' action='/view_blog' method='POST'>
+        <h1><center>Build a Blog</center></h1>
+        {% if blogs|length == 0 %}
+        <p>No blogs yet..</p>
+        {% else %}        
+            {% for blog in blogs %}         
+            <a href='/view_blog?id={{blog.id}}'>
+                <h2>{{blog.title}}</h2>
+            </a>
+            {{blog.content}}        
+        <hr/>
+            {% endfor %}        
+        {% endif %}
+</form>
+{% endblock %}
