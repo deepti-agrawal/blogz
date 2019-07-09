@@ -34,8 +34,8 @@ def add_blog():
     title_error = ""
     description_error = ""
     if request.method == 'POST':
-        title = request.form['blog_title']  
-        description = request.form['blog_desc']  
+        title = cgi.escape(request.form['blog_title'])
+        description = cgi.escape(request.form['blog_desc'])
         if title == "":
             title_error = "Please enter blog title."
         if description == "":
