@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session, flash
+from flask import Flask, request, redirect, render_template, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 import cgi
 
@@ -9,6 +9,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = '123ndh78'
 db = SQLAlchemy(app) #Constructor db object to use in application
+BLOGS_PER_PAGE = 3
 
 class Blog(db.Model):
     id = db.Column(db.Integer,primary_key = True)
@@ -33,7 +34,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login','blogs','signup','index']
+    allowed_routes = ['login','blogs','signup','index','blog']
     if request.endpoint not in allowed_routes and 'user' not in session:
         return redirect("/login")
 
@@ -99,11 +100,22 @@ def logout():
 
 @app.route('/blogs')
 def blogs():
-    blogs =  Blog.query.all()     
-    return render_template('blogs.html',blogs = blogs)
+    prev_url=''
+    next_url=''
+    page = request.args.get('page', 1, type=int)
+    blogs = Blog.query.paginate(page, BLOGS_PER_PAGE, False)
+    if blogs.has_next:
+        next_url = url_for('blogs', page=blogs.next_num)
+    else:
+        None
+    if blogs.has_prev:
+        prev_url = url_for('blogs', page=blogs.prev_num)
+    else:
+        None
+    return render_template('blogs.html',blogs = blogs.items, next_url=next_url, prev_url=prev_url)
 
 @app.route('/blog')
-def user_blogs():
+def blog():
     myuser = ''
     if 'user' not in session:
         myuser =  request.args.get('id')

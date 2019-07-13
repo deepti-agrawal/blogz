@@ -34,6 +34,12 @@
 
         {% block content %}
         {% endblock %}
+        {% if prev_url %}
+        <a href="{{ prev_url }}">Newer Blogs</a>
+        {% endif %}
+        {% if next_url %}
+        <a href="{{ next_url }}">Older Blogs</a>
+        {% endif %}         
 
     </body>
 </html>
