@@ -1,25 +1,39 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>
-            Build A Blog
-        </title>
-        <style>
-           .error{
-                color: red;
+        <title>Blogz</title>
+        <style type="text/css">
+            .error {
+                color: rgb(199, 192, 192);
             }
         </style>
     </head>
     <body>
-        <table>
-            <tr>
-                <td><a href='/blogs'>Main Blog Page</a></td>
-                <td></td>
-                <td></td>
-                <td><a href='/newpost'> Add a Blog Entry</a></td>
-            </tr>
-        </table>
-        {% block content%}        
-        {% endblock%}
+        <div style='float: right'>
+          {% if 'user' in session %}
+          {{ session['user']}}
+          {% endif %}
+          <br>
+            <a href = "/">Home</a> |
+            <a href = "/blogs">All Posts</a> |
+            <a href = '/newpost'>New Post</a> |
+            {% if 'user' not in session %}
+            <a href = "login">Login</a> |
+            {% endif %}
+            <a href = '/logout'>Logout</a>            
+          </div>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {% endblock %}
+
     </body>
-    </html>
+</html>

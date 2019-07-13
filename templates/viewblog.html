@@ -2,4 +2,6 @@
 {% block content%}
         <h1><center>{{blog.title}}</center></h1>
             {{blog.content}}
+            <br>
+            <h6>written by: <a href='/blog?id={{blog.user.email}}'>{{blog.user.email}}</a></h6>
 {% endblock %}
