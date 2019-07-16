@@ -8,7 +8,7 @@
             }
         </style>
     </head>
-    <body>
+    <body bgcolor="#90EE90">
         <div style='float: right'>
           {% if 'user' in session %}
           {{ session['user']}}
@@ -35,10 +35,10 @@
         {% block content %}
         {% endblock %}
         {% if prev_url %}
-        <a href="{{ prev_url }}">Newer Blogs</a>
+        <a href="{{ prev_url }}">Older Blogs</a>
         {% endif %}
         {% if next_url %}
-        <a href="{{ next_url }}">Older Blogs</a>
+        <a href="{{ next_url }}">Newer Blogs</a>
         {% endif %}         
 
     </body>

@@ -3,6 +3,6 @@
 
 <h2>Blog Users!</h2>
 {% for user in users %}
-<a href="/blog?id={{user.email}}"><li>{{user.email}}</li></a>
+<a href="/blog?id={{user.username}}"><li>{{user.username}}</li></a>
 {% endfor %}
 {% endblock %}

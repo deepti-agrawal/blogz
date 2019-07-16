@@ -10,7 +10,7 @@
                 <h2>{{blog.title}}</h2>
             </a>
             {{blog.content}}       
-            <h6>written by: <a href='/blog?id={{blog.user.email}}'>{{blog.user.email}}</a></h6>
+            <h6>written by: <a href='/blog?id={{blog.user.username}}'>{{blog.user.username}}</a></h6>
             {% endfor %}        
         {% endif %}
 </form>

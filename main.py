@@ -24,12 +24,12 @@ class Blog(db.Model):
 
 class User(db.Model):
    id = db.Column(db.Integer,primary_key = True)
-   email = db.Column(db.String(120), unique = True)
+   username = db.Column(db.String(120), unique = True)
    password = db.Column(db.String(120))
    blog = db.relationship('Blog', backref='user')
 
-   def __init__(self,email,password):
-       self.email = email
+   def __init__(self,username,password):
+       self.username = username
        self.password = password
 
 @app.before_request
@@ -41,21 +41,24 @@ def require_login():
 @app.route("/login",methods=['POST','GET'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
-        if not is_email(email):
-            flash('Invalid Email!!')
+        if username == "":
+            flash("Please enter username..")
+            return redirect("/login")
+        if is_email(username):
+            flash("Please enter a valid username..")
             return redirect("/login")
         if password == "":
             flash("Please enter password..")
             return redirect("/login")
-        user = User.query.filter_by(email = email).first()
+        user = User.query.filter_by(username = username).first()
         if user:
             if password != user.password:
                 flash("This combination of Username & Password does not exist!")
                 return redirect("/login")
             else:
-                session['user'] = user.email
+                session['user'] = user.username
                 flash("Logged in...")
                 return redirect('/newpost')
         else:
@@ -67,27 +70,30 @@ def login():
 @app.route("/signup",methods=['POST','GET'])
 def signup():
     if request.method == 'POST':
-        email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
         verify = request.form['verify']
-        if not is_email(email):
-            flash('Invalid Email: ' + email)
+        if username=="" or len(username)<=3:
+            flash("Please enter valid username..")
             return redirect('/signup')
+        if is_email(username):
+            flash("Please enter a valid username..")
+            return redirect("/signup")
         if len(password)<=3:
             flash('Password should be more than 3 characters.')
             return redirect('/signup')
         if password == "" or password != verify:
             flash("Password does not match!!")
             return redirect('/signup')
-        user = User.query.filter_by(email = email).first()
+        user = User.query.filter_by(username = username).first()
         if user:
-            flash("Email already exist. Kindly login..")
+            flash("Username already exist. Kindly login..")
             return redirect("/signup")
         else:
-            user = User(email=email, password=password)
+            user = User(username=username, password=password)
             db.session.add(user)
             db.session.commit()
-            session['user'] = user.email
+            session['user'] = user.username
             return redirect("/newpost")
     else:
         return render_template('signup.html')
@@ -104,12 +110,12 @@ def blogs():
     next_url=''
     page = request.args.get('page', 1, type=int)
     blogs = Blog.query.paginate(page, BLOGS_PER_PAGE, False)
-    if blogs.has_next:
-        next_url = url_for('blogs', page=blogs.next_num)
-    else:
-        None
     if blogs.has_prev:
         prev_url = url_for('blogs', page=blogs.prev_num)
+    else:
+        None
+    if blogs.has_next:
+        next_url = url_for('blogs', page=blogs.next_num)
     else:
         None
     return render_template('blogs.html',blogs = blogs.items, next_url=next_url, prev_url=prev_url)
@@ -121,7 +127,7 @@ def blog():
         myuser =  request.args.get('id')
     else:
         myuser = session['user']
-    user = User.query.filter_by(email = myuser).first()
+    user = User.query.filter_by(username = myuser).first()
     blog =  Blog.query.filter_by(user_id=user.id).all()
     return render_template('singleUser.html', blogs=blog)
 
@@ -148,7 +154,7 @@ def add_blog():
             flash("Please enter blog description.")
             return redirect("/newpost")
         else:
-            user = User.query.filter_by(email=session['user']).first()
+            user = User.query.filter_by(username=session['user']).first()
             new_blog = Blog(title, description,user)            
             db.session.add(new_blog)
             db.session.commit()
@@ -158,16 +164,14 @@ def add_blog():
             return redirect("/login")
         else:
             return render_template("addblog.html")
-    
+
 def is_email(string):
     atsign_index = string.find('@')
+    domain_dot_index = string.find('.')
     atsign_present = atsign_index >= 0
-    if not atsign_present:
-        return False
-    else:
-        domain_dot_index = string.find('.', atsign_index)
-        domain_dot_present = domain_dot_index >= 0
-        return domain_dot_present
+    domain_dot_index = domain_dot_index >= 0
+    if atsign_present or domain_dot_index:
+        return True
 
 if __name__ == '__main__':
     app.run()
